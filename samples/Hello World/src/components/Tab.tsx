@@ -5,15 +5,21 @@ import React from 'react';
 import './App.css';
 import * as microsoftTeams from "@microsoft/teams-js";
 
+export interface TabProp {
+  context?: microsoftTeams.Context
+  theme: string
+}
+
 /**
  * The 'PersonalTab' component renders the main tab content
  * of your app.
  */
-class Tab extends React.Component<any, any> {
+class Tab extends React.Component<any, TabProp> {
   constructor(props: any){
     super(props)
     this.state = {
-      context: {}
+      context: undefined,
+      theme: 'default' 
     }
   }
 
@@ -27,18 +33,45 @@ class Tab extends React.Component<any, any> {
       });
     });
     // Next steps: Error handling using the error object
+
+    microsoftTeams.registerOnThemeChangeHandler(theme => {
+      if (theme !== this.state.theme) {
+        this.setState({ theme });  
+      }
+    });
   }
 
   render() {
 
-      const userName = Object.keys(this.state.context).length > 0 ? this.state.context['upn'] : "";
+      const isTheme = this.state.theme
+
+      let newTheme
+
+      if (isTheme === "default") {
+        newTheme = {
+          backgroundColor: "#EEF1F5",
+          color: "#16233A"
+        };
+      } else {
+        newTheme = {
+          backgroundColor: "#2B2B30",
+          color: "#FFFFFF"
+        };
+      }
+
+      // const userName = Object.keys(this.state.context).length > 0 ? this.state.context['upn'] : "";
 
       return (
-      <div>
-        <h3>Hello World!</h3>
-        <h1>Congratulations {userName}!</h1> <h3>This is the tab you made :-)</h3>
-      </div>
-      );
+        <div style={newTheme}>
+          <h1>Important Contacts</h1>
+            <ul>
+              <li>Help Desk: <a href="mailto:support@company.com">support@company.com</a></li>
+              <li>Human Resources: <a href="mailto:hr@company.com">hr@company.com</a></li>
+              <li>Facilities: <a href="mailto:facilities@company.com">facilities@company.com</a></li>
+            </ul>
+        </div>
+        );
+    
   }
 }
 export default Tab;
